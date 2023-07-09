@@ -1,9 +1,44 @@
 // https://api.openweathermap.org/data/2.5/weather?q=karachi&appid=9c6bb8ff8d76e2d9b0738ec270dcfae7
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./style.css";
 
 const Temp = () => {
+  const [searchValue, setSearchValue] = useState("karachi");
+  const [tempInfo, setTempInfo] = useState("");
+
+  const getWeatherInfo = async () => {
+    try {
+      let url = `https://api.openweathermap.org/data/2.5/weather?q=${searchValue}&units=metric&appid=9c6bb8ff8d76e2d9b0738ec270dcfae7`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      const { temp, humidity, pressure } = data.main;
+      const { main: weathermood } = data.weather[0];
+      const { name } = data;
+      const { speed } = data.wind;
+      const { country, sunset } = data.sys;
+
+      const myNewWeatherInfo = {
+        temp,
+        humidity,
+        pressure,
+        weathermood,
+        name,
+        speed,
+        country,
+        sunset,
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getWeatherInfo();
+  }, []);
+
   return (
     <>
       <div className="wrap">
@@ -14,9 +49,15 @@ const Temp = () => {
             autoFocus
             id="search"
             className="searchTerm"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
 
-          <button className="searchButton" type="button">
+          <button
+            className="searchButton"
+            type="button"
+            onClick={getWeatherInfo}
+          >
             Search
           </button>
         </div>
